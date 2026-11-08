@@ -1,16 +1,20 @@
-# React + Vite
+# Family tree version history
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Version 0.0.1 - Initial release of the family tree project. (master branch)
+- Features include basic family member addition, relationship mapping, and visualization of the family tree structure.
+- WatermelonDB mainly linked to the person table, with some additional tables for relationships and events.
+- Can add family members, edit their details, and view their relationships in a tree format.
+- Can apply for certificates for family members, with basic validation and submission features.
+- Save to local storage and sync with a remote database for backup and sharing purposes.
+- Save certificates as PDF files for download and printing.
 
-Currently, two official plugins are available:
+## Version 0.1.0  - Rewrite of the family tree project. (rewrite branch)
+- Databse stucture has been rewritten be focused on events rather than person.
+- Unique identifiers for people and events have been added to allow human readable names to be used as identifiers for relationships and events
+- Person table has been simplified to only include basic information such as name, birth date, and death date which are placeholders/ fallbacks for events.
+- Person table has hosts recod IDs for events and relationships rather than storing them directly in the person table.
+- Marrriage records have been merged into relationship records 
+- Recors are now main source of truth for the person
+- Welcome screen, people table, person detail screen and edit person screen have been rewritten to reflect the new data structure and relationships.
+- Currenly not working: Family tree visualization, relationship mapping, certificate application forms and event management features are still being rewritten to reflect the new data structure.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
