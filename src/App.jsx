@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { withObservables } from '@nozbe/watermelondb/react';
 import database from './database';
 import PeopleTable from './components/PeopleTable';
-import FamilyTree from './components/FamilyTree';
+// import FamilyTree from './components/FamilyTree';
 import BackupRestore from './components/BackupRestore';
 import WelcomeScreen from './components/WelcomeScreen';
-
+// import ProfilePage from './components/ProfilePage';
 
 function App({ people }) {
     const [view, setView] = useState('list');
@@ -21,10 +21,14 @@ function App({ people }) {
                     className={view === 'list' ? 'nav-active' : ''}
                     onClick={() => setView('list')}
                 >People</button>
+{/*                 <button
+                    className={view === 'profile' ? 'nav-active' : ''}
+                    onClick={() => setView('profile')}
+                >Profile</button>
                 <button
                     className={view === 'tree' ? 'nav-active' : ''}
                     onClick={() => setView('tree')}
-                >Family Tree</button>
+                >Family Tree</button> */}
                 <button
                     className={view === 'backup' ? 'nav-active' : ''}
                     onClick={() => setView('backup')}
@@ -32,8 +36,10 @@ function App({ people }) {
             </nav>
 
             {view === 'list' && <PeopleTable />}
-            {view === 'tree' && <FamilyTree />}
+{/*             {view === 'tree' && <FamilyTree />}
+            {view === 'profile' && <ProfilePage />} */}
             {view === 'backup' && <BackupRestore />}
+
         </div>
     );
 }

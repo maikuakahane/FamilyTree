@@ -1,58 +1,39 @@
 import { Model } from '@nozbe/watermelondb';
-import { text, field, lazy } from '@nozbe/watermelondb/decorators';
-import { Q } from '@nozbe/watermelondb';
+import { text, field, json } from '@nozbe/watermelondb/decorators';
+
+const sanitizeIds = (raw) =>
+    Array.isArray(raw) ? raw.filter((id) => typeof id === 'string') : [];
+
 
 export default class Person extends Model {
     static table = 'people';
-    static associations = {
-        relationships: { type: 'has_many', foreignKey: 'person1_id' },
-    };
 
-    // General
-    @text('first_name') firstName;
-    @text('last_name') lastName;
-    @text('birth_name') birthName;
-    @text('gender') gender;
-    @text('email') email;
+        // General
+    @text('first_name_p') firstNameP; // this is a placeholder if no event is linked
+    @text('last_name_p') lastNameP; // this is a placeholder if no event is linked
+    @text('birth_name_p') birthNameP; // this is a placeholder if no event is linked
+    @text('gender_p') genderP; // this is a placeholder if no event is linked
 
-    // Birth
-    @field('born_at') bornAt;
-    @text('birth_town') birthTown;
-    @text('birth_country') birthCountry;
+    //IDs
+    @field('person_id') personId;
+    @text('generation') generation; // this is populated when linked as a child or parent or updated running recalculation script. 
+   // @text('tree_id')TreeID // this is to store ID of position on the tree. "1B1" would be father of the main person "1B3" would be father of the main person's first spouse "2B1 "Would be the main person eldest chid"
 
-    // Death
-    @field('deceased') deceased;
-    @field('died_at') diedAt;
-    @text('death_town') deathTown;
-    @text('death_country') deathCountry;
+    //Linked event IDs
 
-    // Research
-    @field('birth_certificate_obtained') birthCertificateObtained;
-    @field('marriage_certificate_obtained') marriageCertificateObtained;
-    @field('death_certificate_obtained') deathCertificateObtained;
+    @field('birth_idR') birthIdR;
+    @json('relationship_idsR', sanitizeIds) relationshipIdsR;
+    @field('death_idR') deathIdR;
+    @json('citizenship_idsR',sanitizeIds) citizenshipIdsR;
+    @field('contact_idR') contactIdR;
+    @json('address_idsR',sanitizeIds) addressIdsR;
+    //@json('education_id') educationId;
+    //@json('career_id') carrerId;
+    
 
     // Family tree
     @field('is_owner') isOwner;
 
-    // Lazy queries
-    @lazy parents = this.collections
-        .get('relationships')
-        .query(
-            Q.where('person2_id', this.id),
-            Q.where('relationship_type', 'parent')
-        );
-
-    @lazy children = this.collections
-        .get('relationships')
-        .query(
-            Q.where('person1_id', this.id),
-            Q.where('relationship_type', 'parent')
-        );
-
-    @lazy spouses = this.collections
-        .get('relationships')
-        .query(
-            Q.where('person1_id', this.id),
-            Q.where('relationship_type', 'spouse')
-        );
 }
+
+//@text('_id') ID;

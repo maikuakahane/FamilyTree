@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { withObservables } from '@nozbe/watermelondb/react';
 import database, { saveToFile } from '../database';
 import { Q } from '@nozbe/watermelondb';
-import { calculateGenerationLabel } from '../utils/familyUtils';
+// import { calculateGenerationLabel } from '../utils/familyUtils';
+import { displayDetails, formatDate, formatPlace } from '../utils/displayUtils';
 
 // General (person management) modals/forms
 import PersonForm from './PersonForm';
@@ -21,9 +22,7 @@ import CitizenshipEditModal from './CitizenshipEditModal';
 import BirthCertificateModal from './BirthCertificateModal';
 import MarriageCertificateModal from './MarriageCertificateModal';
 import DeathCertificateModal from './DeathCertificateModal';
-
-const Tick = () => <span style={{ color: '#6dbf67', fontSize: '16px' }}>✓</span>;
-const Cross = () => <span style={{ color: '#e05555', fontSize: '16px' }}>✗</span>;
+import BirthRecord from '../database/models/birthRecord';
 
 const EditBtn = ({ onClick }) => (
     <button
@@ -98,42 +97,41 @@ const STATUS_LABELS = {
     widowed: 'Widowed',
 };
 
-const handleUploadDocument = async (person) => {
-    const { filePaths, canceled } = await window.electronDB.openFile();
-    if (canceled || !filePaths.length) return;
+//const handleUploadDocument = async (person) => {
+//    const { filePaths, canceled } = await window.electronDB.openFile();
+//    if (canceled || !filePaths.length) return;
 
-    const sourcePath = filePaths[0];
-    const fileName = sourcePath.split('\\').pop().split('/').pop();
+//    const sourcePath = filePaths[0];
+//    const fileName = sourcePath.split('\\').pop().split('/').pop();
 
-    // Load owner
-    const ownerResults = await database.collections
-        .get('people')
-        .query(Q.where('is_owner', true))
-        .fetch();
-    const owner = ownerResults[0] || null;
+//    // Load owner
+//    const ownerResults = await database.collections
+//        .get('people')
+//        .query(Q.where('is_owner', true))
+//        .fetch();
+//    const owner = ownerResults[0] || null;
 
-    // Calculate generation
-    const genLabel = owner
-        ? await calculateGenerationLabel(owner.id, person.id)
-        : 'Gen 0';
+//    // Calculate generation
+//    const genLabel = owner
+//        ? await calculateGenerationLabel(owner.id, person.id)
+//        : 'Gen 0';
 
-    const folderPath = `${genLabel}/${person.firstName} ${person.lastName}`;
+//    const folderPath = `${genLabel}/${person.firstName} ${person.lastName}`;
 
-    const result = await window.electronDB.copyDocument({
-        sourcePath,
-        folderPath,
-        fileName,
-    });
+//    const result = await window.electronDB.copyDocument({
+//        sourcePath,
+//        folderPath,
+//        fileName,
+//    });
 
-    if (result.success) {
-        console.log('Document saved to', result.filePath);
-    }
-};
+//    if (result.success) {
+//        console.log('Document saved to', result.filePath);
+//    }
+//};
 
-function PeopleTable({ people, marriages, addresses, citizenships }) {
+function PeopleTable({ people, birthRecords, relationshipRecords, deathRecords, citizenshipRecords, addresses }) {
     const [search, setSearch] = useState('');
     // Mutually exclusive group: 'general' | 'research' | 'certificates' | null
-    const [group, setGroup] = useState('general');
 
     // General — full-screen forms/modals
     const [showAdd, setShowAdd] = useState(false);
@@ -156,7 +154,6 @@ function PeopleTable({ people, marriages, addresses, citizenships }) {
 
     if (!people) return <div className="people-list"><p>Loading...</p></div>;
 
-    const toggleGroup = (g) => setGroup((prev) => (prev === g ? null : g));
 
     const filtered = people.filter((p) => {
         const term = search.toLowerCase();
@@ -168,43 +165,6 @@ function PeopleTable({ people, marriages, addresses, citizenships }) {
             (p.birthCountry || '').toLowerCase().includes(term)
         );
     });
-
-    const getMarriages = (personId) =>
-        marriages.filter(m => m.person1Id === personId || m.person2Id === personId);
-
-    const getCurrentAddress = (personId) =>
-        addresses.find(a => a.personId === personId && !a.movedOutAt) || null;
-
-    const getAddresses = (personId) =>
-        addresses.filter(a => a.personId === personId);
-
-    const getCitizenship = (personId) =>
-        citizenships.find(c => c.personId === personId) || null;
-
-    const getRelationshipStatus = (personId) => {
-        const m = getMarriages(personId)[0];
-        if (!m) return '—';
-        return STATUS_LABELS[m.status] || m.status || '—';
-    };
-
-    const formatDate = (timestamp) =>
-        timestamp ? new Date(timestamp).toLocaleDateString('en-GB') : '—';
-
-    const formatPlace = (town, country) => {
-        const parts = [town, country].filter(Boolean);
-        return parts.length > 0 ? parts.join(', ') : '—';
-    };
-
-    const formatAddress = (address) => {
-        if (!address) return '—';
-        const parts = [
-            address.addressStreet,
-            address.addressTown,
-            address.addressCountry,
-            address.addressCode,
-        ].filter(Boolean);
-        return parts.length > 0 ? parts.join(', ') : '—';
-    };
 
     const handleDelete = async (person) => {
         if (window.confirm(`Delete ${person.firstName} ${person.lastName}?`)) {
@@ -239,85 +199,9 @@ function PeopleTable({ people, marriages, addresses, citizenships }) {
     }
 
     // Number of body columns for each group (used for header colSpans where needed).
-    const showResearch = group === 'research';
-    const showCertificates = group === 'certificates';
-    const showGeneral = group === 'general';
-    const grouped = showResearch || showCertificates; // uses a two-row header
 
     const renderHeader = () => {
-        if (grouped) {
-            return (
-                <thead>
-                    <tr>
-                        <th rowSpan={2}>First Name</th>
-                        <th rowSpan={2}>Surname</th>
-                        <th rowSpan={2}>Birth Surname</th>
-                        <th rowSpan={2}>Date of Birth</th>
-
-                        {showResearch && (
-                            <>
-                                <th colSpan={4} style={{ textAlign: 'center' }}>Birth</th>
-                                <th colSpan={4} style={{ textAlign: 'center' }}>Marriage</th>
-                                <th colSpan={4} style={{ textAlign: 'center' }}>Death</th>
-                                <th colSpan={3} style={{ textAlign: 'center' }}>Current Address</th>
-                                <th colSpan={3} style={{ textAlign: 'center' }}>Citizenship</th>
-                                <th colSpan={1} style={{ textAlign: 'center' }}>Documents</th>
-                            </>
-                        )}
-                        {showCertificates && (
-                            <>
-                                <th colSpan={2} style={{ textAlign: 'center' }}>🏛 Birth Certificate</th>
-                                <th colSpan={2} style={{ textAlign: 'center' }}>💍 Marriage Certificate</th>
-                                <th colSpan={2} style={{ textAlign: 'center' }}>✝ Death Certificate</th>
-                            </>
-                        )}
-                    </tr>
-                    <tr>
-                        {showResearch && (
-                            <>
-                                {/* Birth */}
-                                <th>Date</th>
-                                <th>Place</th>
-                                <th title="Birth Certificate">🏛 Cert</th>
-                                <th>Edit</th>
-                                {/* Marriage */}
-                                <th>Date</th>
-                                <th>Place</th>
-                                <th title="Marriage Certificate">💍 Cert</th>
-                                <th>Edit</th>
-                                {/* Death */}
-                                <th>Date</th>
-                                <th>Place</th>
-                                <th title="Death Certificate">✝ Cert</th>
-                                <th>Edit</th>
-                                {/* Address */}
-                                <th>Address</th>
-                                <th>Since</th>
-                                <th>Edit</th>
-                                {/* Citizenship */}
-                                <th>Birth</th>
-                                <th>Naturalised</th>
-                                <th>Edit</th>
-                                {/* Documents */}
-                                <th>Upload</th>
-                            </>
-                        )}
-                        {showCertificates && (
-                            <>
-                                <th style={{ textAlign: 'center' }}>Obtained</th>
-                                <th style={{ textAlign: 'center' }}>Apply</th>
-                                <th style={{ textAlign: 'center' }}>Obtained</th>
-                                <th style={{ textAlign: 'center' }}>Apply</th>
-                                <th style={{ textAlign: 'center' }}>Obtained</th>
-                                <th style={{ textAlign: 'center' }}>Apply</th>
-                            </>
-                        )}
-                    </tr>
-                </thead>
-            );
-        }
-
-        // General or no group — single header row
+       
         return (
             <thead>
                 <tr>
@@ -325,144 +209,41 @@ function PeopleTable({ people, marriages, addresses, citizenships }) {
                     <th>Surname</th>
                     <th>Birth Surname</th>
                     <th>Date of Birth</th>
-                    {showGeneral && (
-                        <>
-                            <th>Relationship Status</th>
-                            <th>Actions</th>
-                        </>
-                    )}
-                </tr>
+                    <th>Place of Birth</th>
+                    <th>Relationship Status</th>
+                    <th>Actions</th>
+                     
+                                  </tr>
             </thead>
         );
     };
 
     const renderRow = (person) => {
-        const personMarriages = getMarriages(person.id);
-        const currentAddress = getCurrentAddress(person.id);
-        const citizenship = getCitizenship(person.id);
+        const details = displayDetails(person, birthRecords, deathRecords);
 
         return (
             <tr key={person.id}>
                 {/* Fixed columns */}
-                <td>{person.firstName}{person.isOwner ? ' 👑' : ''}</td>
-                <td>{person.lastName}</td>
-                <td>{person.birthName || '—'}</td>
-                <td>{formatDate(person.bornAt)}</td>
-
-                {/* General */}
-                {showGeneral && (
-                    <>
-                        <td>{getRelationshipStatus(person.id)}</td>
+                <td>{details.firstName}{person.isOwner ? ' 👑' : ''}</td>
+                <td>{details.lastName}</td>
+                <td>{details.birthName || '—'}</td>
+                <td>{formatDate(details.birthDay, details.birthMonth, details.birthYear)}</td>
+                <td>{formatPlace(details.birthTown, details.birthCounty, details.birthCountry)}</td>
+                <td>Not yet implemented</td>
                         <td>
                             <div className="action-buttons">
                                 <button onClick={() => setViewingPerson(person)}>🔍</button>
                                 <button onClick={() => setEditingPerson(person)}>✎</button>
-                                <button className="delete-btn" onClick={() => handleDelete(person)}>🗑</button>
+                        <button onClick={() => setEditBirth(person)}>Birth Edit</button>
+                        <button onClick={() => setEditMarriage(person)}>Marriage Edit</button>
+                        <button onClick={() => setEditDeath(person)}>Death Edit</button>
+                        <button onClick={() => setBirthModal(person)}>Birth Cert</button>
+                        <button onClick={() => setMarriageModal(person)}>Marriage Cert</button>
+                        <button onClick={() => setDeathModal(person)}>Death Cert</button>
+                        <button className="delete-btn" onClick={() => handleDelete(person)}>🗑</button>
+
                             </div>
                         </td>
-                    </>
-                )}
-
-                {/* Research */}
-                {showResearch && (
-                    <>
-                        {/* Birth */}
-                        <td>{formatDate(person.bornAt)}</td>
-                        <td>{formatPlace(person.birthTown, person.birthCountry)}</td>
-                        <td style={{ textAlign: 'center' }}>
-                            {person.birthCertificateObtained ? <Tick /> : <Cross />}
-                        </td>
-                        <td style={{ textAlign: 'center' }}>
-                            <EditBtn onClick={() => setEditBirth(person)} />
-                        </td>
-
-                        {/* Marriage */}
-                        <td>
-                            {personMarriages.length === 0 ? '—' :
-                                personMarriages.map(m => <div key={m.id}>{formatDate(m.marriedAt)}</div>)}
-                        </td>
-                        <td>
-                            {personMarriages.length === 0 ? '—' :
-                                personMarriages.map(m => <div key={m.id}>{formatPlace(m.marriageTown, m.marriageCountry)}</div>)}
-                        </td>
-                        <td style={{ textAlign: 'center' }}>
-                            {person.marriageCertificateObtained ? <Tick /> : <Cross />}
-                        </td>
-                        <td style={{ textAlign: 'center' }}>
-                            <EditBtn onClick={() => setEditMarriage(person)} />
-                        </td>
-
-                        {/* Death */}
-                        <td>{person.deceased ? formatDate(person.diedAt) : '—'}</td>
-                        <td>{person.deceased ? formatPlace(person.deathTown, person.deathCountry) : '—'}</td>
-                        <td style={{ textAlign: 'center' }}>
-                            {person.deathCertificateObtained ? <Tick /> : <Cross />}
-                        </td>
-                        <td style={{ textAlign: 'center' }}>
-                            <EditBtn onClick={() => setEditDeath(person)} />
-                        </td>
-
-                        {/* Address */}
-                        <td>{formatAddress(currentAddress)}</td>
-                        <td>{currentAddress ? formatDate(currentAddress.movedInAt) : '—'}</td>
-                        <td style={{ textAlign: 'center' }}>
-                            <EditBtn onClick={() => setEditAddress(person)} />
-                        </td>
-
-                        {/* Citizenship */}
-                        <td>{citizenship?.birthCitizenship || '—'}</td>
-                        <td>{citizenship?.naturalisedCitizenship || '—'}</td>
-                        <td style={{ textAlign: 'center' }}>
-                            <EditBtn onClick={() => setEditCitizenship(person)} />
-                        </td>
-
-                        {/* Documents */}
-                        <td style={{ textAlign: 'center' }}>
-                            <button
-                                onClick={() => handleUploadDocument(person)}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    fontSize: '14px',
-                                    opacity: 0.7,
-                                    padding: '2px 4px',
-                                    color: 'var(--text-primary)',
-                                }}
-                                title="Upload Document"
-                            >📎</button>
-                        </td>
-                    </>
-                )}
-
-                {/* Certificates */}
-                {showCertificates && (
-                    <>
-                        {/* Birth Certificate */}
-                        <td style={{ textAlign: 'center' }}>
-                            {person.birthCertificateObtained ? <Tick /> : <Cross />}
-                        </td>
-                        <td style={{ textAlign: 'center' }}>
-                            <ApplyBtn onClick={() => setBirthModal(person)} />
-                        </td>
-
-                        {/* Marriage Certificate */}
-                        <td style={{ textAlign: 'center' }}>
-                            {person.marriageCertificateObtained ? <Tick /> : <Cross />}
-                        </td>
-                        <td style={{ textAlign: 'center' }}>
-                            <ApplyBtn onClick={() => setMarriageModal(person)} />
-                        </td>
-
-                        {/* Death Certificate */}
-                        <td style={{ textAlign: 'center' }}>
-                            {person.deathCertificateObtained ? <Tick /> : <Cross />}
-                        </td>
-                        <td style={{ textAlign: 'center' }}>
-                            <ApplyBtn onClick={() => setDeathModal(person)} />
-                        </td>
-                    </>
-                )}
             </tr>
         );
     };
@@ -474,7 +255,7 @@ function PeopleTable({ people, marriages, addresses, citizenships }) {
             {editBirth && (
                 <BirthEditModal person={editBirth} onClose={() => setEditBirth(null)} />
             )}
-            {editMarriage && (
+{/*             {editMarriage && (
                 <MarriageEditModal
                     person={editMarriage}
                     marriages={getMarriages(editMarriage.id)}
@@ -497,20 +278,20 @@ function PeopleTable({ people, marriages, addresses, citizenships }) {
                     citizenship={getCitizenship(editCitizenship.id)}
                     onClose={() => setEditCitizenship(null)}
                 />
-            )}
+            )} */}
 
             {/* Certificate overlay modals */}
             {birthModal && (
                 <BirthCertificateModal person={birthModal} onClose={() => setBirthModal(null)} />
             )}
-            {marriageModal && (
+            {/* {marriageModal && (
                 <MarriageCertificateModal
                     person={marriageModal}
                     marriages={getMarriages(marriageModal.id)}
                     allPeople={people}
                     onClose={() => setMarriageModal(null)}
                 />
-            )}
+            )} */}
             {deathModal && (
                 <DeathCertificateModal person={deathModal} onClose={() => setDeathModal(null)} />
             )}
@@ -518,19 +299,6 @@ function PeopleTable({ people, marriages, addresses, citizenships }) {
             <div className="people-list-header">
                 <h2>Family Members</h2>
                 <button onClick={() => setShowAdd(true)}>+ Add Person</button>
-            </div>
-
-            <div
-                style={{
-                    display: 'flex',
-                    gap: '8px',
-                    margin: '8px 0',
-                    flexWrap: 'wrap',
-                }}
-            >
-                <GroupSwitch label="General" active={showGeneral} onClick={() => toggleGroup('general')} />
-                <GroupSwitch label="Research" active={showResearch} onClick={() => toggleGroup('research')} />
-                <GroupSwitch label="Certificates" active={showCertificates} onClick={() => toggleGroup('certificates')} />
             </div>
 
             <div className="search-bar">
@@ -565,9 +333,12 @@ function PeopleTable({ people, marriages, addresses, citizenships }) {
 
 const enhance = withObservables([], () => ({
     people: database.collections.get('people').query(),
-    marriages: database.collections.get('marriages').query(),
+    birthRecords: database.collections.get('birth_records').query(),
+    relationshipRecords: database.collections.get('relationship_records').query(),
+    deathRecords: database.collections.get('death_records').query(),
+    citizenshipRecords: database.collections.get('citizenship_records').query(),
     addresses: database.collections.get('addresses').query(),
-    citizenships: database.collections.get('citizenships').query(),
+
 }));
 
 const EnhancedPeopleTable = enhance(PeopleTable);

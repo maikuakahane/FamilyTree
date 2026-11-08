@@ -537,3 +537,35 @@ button {
 .people-table td:last-child {
     width: 100px;
 }
+
+.profile-page {
+    display: flex;
+    gap: 16px;
+    padding: 24px;
+}
+
+.profile-overview {
+    flex: 1;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    outline: 4px solid red;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+
+.profile-details {
+    flex: 2;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    outline: 4px solid red;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
