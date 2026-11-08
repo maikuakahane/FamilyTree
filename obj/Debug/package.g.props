@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <PackageJsonName Condition="$(PackageJsonName) == ''">familytree</PackageJsonName>
+    <PackageJsonAuthor Condition="$(PackageJsonAuthor) == ''">Michal Zajpt</PackageJsonAuthor>
+    <PackageJsonPrivate Condition="$(PackageJsonPrivate) == ''">true</PackageJsonPrivate>
+    <PackageJsonVersion Condition="$(PackageJsonVersion) == ''">0.0.0</PackageJsonVersion>
+    <PackageJsonType Condition="$(PackageJsonType) == ''">module</PackageJsonType>
+    <PackageJsonMain Condition="$(PackageJsonMain) == ''">electron/main.cjs</PackageJsonMain>
+    <PackageJsonScriptsDev Condition="$(PackageJsonScriptsDev) == ''">vite</PackageJsonScriptsDev>
+    <PackageJsonScriptsBuild Condition="$(PackageJsonScriptsBuild) == ''">vite build</PackageJsonScriptsBuild>
+    <PackageJsonScriptsElectron Condition="$(PackageJsonScriptsElectron) == ''">electron .</PackageJsonScriptsElectron>
+    <PackageJsonScriptsElectronDev Condition="$(PackageJsonScriptsElectronDev) == ''">concurrently "yarn dev" "wait-on http://localhost:55286 &amp;&amp; electron ."</PackageJsonScriptsElectronDev>
+    <PackageJsonScriptsElectronBuild Condition="$(PackageJsonScriptsElectronBuild) == ''">yarn build &amp;&amp; electron-builder</PackageJsonScriptsElectronBuild>
+    <PackageJsonBuildAppid Condition="$(PackageJsonBuildAppid) == ''">com.familytree.app</PackageJsonBuildAppid>
+    <PackageJsonBuildProductname Condition="$(PackageJsonBuildProductname) == ''">Family Tree</PackageJsonBuildProductname>
+    <PackageJsonBuildDirectoriesOutput Condition="$(PackageJsonBuildDirectoriesOutput) == ''">release</PackageJsonBuildDirectoriesOutput>
+    <PackageJsonBuildFiles Condition="$(PackageJsonBuildFiles) == ''">[
+  "dist/**/*",
+  "electron/**/*"
+]</PackageJsonBuildFiles>
+    <PackageJsonBuildWinTarget Condition="$(PackageJsonBuildWinTarget) == ''">nsis</PackageJsonBuildWinTarget>
+    <PackageJsonBuildNsisOneclick Condition="$(PackageJsonBuildNsisOneclick) == ''">false</PackageJsonBuildNsisOneclick>
+    <PackageJsonBuildNsisPermachine Condition="$(PackageJsonBuildNsisPermachine) == ''">true</PackageJsonBuildNsisPermachine>
+    <PackageJsonBuildNsisAllowtochangeinstallationdirectory Condition="$(PackageJsonBuildNsisAllowtochangeinstallationdirectory) == ''">true</PackageJsonBuildNsisAllowtochangeinstallationdirectory>
+    <PackageJsonDependenciesNozbeWatermelondb Condition="$(PackageJsonDependenciesNozbeWatermelondb) == ''">^0.28.0</PackageJsonDependenciesNozbeWatermelondb>
+    <PackageJsonDependenciesXyflowReact Condition="$(PackageJsonDependenciesXyflowReact) == ''">^12.10.1</PackageJsonDependenciesXyflowReact>
+    <PackageJsonDependenciesReact Condition="$(PackageJsonDependenciesReact) == ''">^19.2.0</PackageJsonDependenciesReact>
+    <PackageJsonDependenciesReactDom Condition="$(PackageJsonDependenciesReactDom) == ''">^19.2.0</PackageJsonDependenciesReactDom>
+    <PackageJsonDependenciesReactRouterDom Condition="$(PackageJsonDependenciesReactRouterDom) == ''">^7.13.1</PackageJsonDependenciesReactRouterDom>
+    <PackageJsonDevdependenciesBabelPluginProposalClassProperties Condition="$(PackageJsonDevdependenciesBabelPluginProposalClassProperties) == ''">^7.18.6</PackageJsonDevdependenciesBabelPluginProposalClassProperties>
+    <PackageJsonDevdependenciesBabelPluginProposalDecorators Condition="$(PackageJsonDevdependenciesBabelPluginProposalDecorators) == ''">^7.29.0</PackageJsonDevdependenciesBabelPluginProposalDecorators>
+    <PackageJsonDevdependenciesBabelPluginTransformRuntime Condition="$(PackageJsonDevdependenciesBabelPluginTransformRuntime) == ''">^7.29.0</PackageJsonDevdependenciesBabelPluginTransformRuntime>
+    <PackageJsonDevdependenciesEslintJs Condition="$(PackageJsonDevdependenciesEslintJs) == ''">^9.39.1</PackageJsonDevdependenciesEslintJs>
+    <PackageJsonDevdependenciesTypesReact Condition="$(PackageJsonDevdependenciesTypesReact) == ''">^19.2.7</PackageJsonDevdependenciesTypesReact>
+    <PackageJsonDevdependenciesTypesReactDom Condition="$(PackageJsonDevdependenciesTypesReactDom) == ''">^19.2.3</PackageJsonDevdependenciesTypesReactDom>
+    <PackageJsonDevdependenciesVitejsPluginReact Condition="$(PackageJsonDevdependenciesVitejsPluginReact) == ''">^5.1.1</PackageJsonDevdependenciesVitejsPluginReact>
+    <PackageJsonDevdependenciesConcurrently Condition="$(PackageJsonDevdependenciesConcurrently) == ''">^9.2.1</PackageJsonDevdependenciesConcurrently>
+    <PackageJsonDevdependenciesElectron Condition="$(PackageJsonDevdependenciesElectron) == ''">^41.0.0</PackageJsonDevdependenciesElectron>
+    <PackageJsonDevdependenciesElectronBuilder Condition="$(PackageJsonDevdependenciesElectronBuilder) == ''">^26.8.1</PackageJsonDevdependenciesElectronBuilder>
+    <PackageJsonDevdependenciesEslint Condition="$(PackageJsonDevdependenciesEslint) == ''">^9.39.1</PackageJsonDevdependenciesEslint>
+    <PackageJsonDevdependenciesEslintPluginReactHooks Condition="$(PackageJsonDevdependenciesEslintPluginReactHooks) == ''">^7.0.1</PackageJsonDevdependenciesEslintPluginReactHooks>
+    <PackageJsonDevdependenciesEslintPluginReactRefresh Condition="$(PackageJsonDevdependenciesEslintPluginReactRefresh) == ''">^0.4.24</PackageJsonDevdependenciesEslintPluginReactRefresh>
+    <PackageJsonDevdependenciesGlobals Condition="$(PackageJsonDevdependenciesGlobals) == ''">^16.5.0</PackageJsonDevdependenciesGlobals>
+    <PackageJsonDevdependenciesVite Condition="$(PackageJsonDevdependenciesVite) == ''">^7.3.1</PackageJsonDevdependenciesVite>
+    <PackageJsonDevdependenciesWaitOn Condition="$(PackageJsonDevdependenciesWaitOn) == ''">^9.0.4</PackageJsonDevdependenciesWaitOn>
+  </PropertyGroup>
+</Project>
