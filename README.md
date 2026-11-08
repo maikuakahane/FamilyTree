@@ -11,7 +11,7 @@
 ## Version 0.1.0  - Rewrite of the family tree project. (rewrite branch)
 - Databse stucture has been rewritten be focused on events rather than person.
 - Unique identifiers for people and events have been added to allow human readable names to be used as identifiers for relationships and events
-- Person table has been simplified to only include basic information such as name, birth date, and death date which are placeholders/ fallbacks for events.
+- Person table has been simplified to only include basic information (names, gender) which are placeholders/ fallbacks for events.
 - Person table has hosts recod IDs for events and relationships rather than storing them directly in the person table.
 - Marrriage records have been merged into relationship records 
 - Recors are now main source of truth for the person
