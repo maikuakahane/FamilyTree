@@ -3,7 +3,7 @@ import { withObservables } from '@nozbe/watermelondb/react';
 import database, { saveToFile } from '../database';
 import { Q } from '@nozbe/watermelondb';
 // import { calculateGenerationLabel } from '../utils/familyUtils';
-import { displayDetails, formatDate, formatPlace } from '../utils/displayUtils';
+import { displayDetails, formatDate, formatPlace, getLinkedRecords } from '../utils/displayUtils';
 
 // General (person management) modals/forms
 import PersonForm from './PersonForm';
@@ -142,15 +142,17 @@ function PeopleTable({ people, birthRecords, relationshipRecords, deathRecords, 
 
     // Research — overlay modals
     const [editBirth, setEditBirth] = useState(null);
-    const [editMarriage, setEditMarriage] = useState(null);
+   // const [editMarriage, setEditMarriage] = useState(null);
     const [editDeath, setEditDeath] = useState(null);
-    const [editAddress, setEditAddress] = useState(null);
-    const [editCitizenship, setEditCitizenship] = useState(null);
+  //  const [editAddress, setEditAddress] = useState(null);
+  //  const [editCitizenship, setEditCitizenship] = useState(null);
 
     // Certificates — overlay modals
     const [birthModal, setBirthModal] = useState(null);
-    const [marriageModal, setMarriageModal] = useState(null);
+    const [newBirthPerson, setNewBirthPerson] = useState(null);
+ //   const [marriageModal, setMarriageModal] = useState(null);
     const [deathModal, setDeathModal] = useState(null);
+    const [newDeathPerson, setNewDeathPerson] = useState(null);
 
     if (!people) return <div className="people-list"><p>Loading...</p></div>;
 
@@ -220,6 +222,9 @@ function PeopleTable({ people, birthRecords, relationshipRecords, deathRecords, 
 
     const renderRow = (person) => {
         const details = displayDetails(person, birthRecords, deathRecords);
+        const birth = getLinkedRecords(person, { birthRecords, deathRecords }).birth;
+        const death = getLinkedRecords(person, { birthRecords, deathRecords }).death;
+
 
         return (
             <tr key={person.id}>
@@ -234,10 +239,12 @@ function PeopleTable({ people, birthRecords, relationshipRecords, deathRecords, 
                             <div className="action-buttons">
                                 <button onClick={() => setViewingPerson(person)}>🔍</button>
                                 <button onClick={() => setEditingPerson(person)}>✎</button>
-                        <button onClick={() => setEditBirth(person)}>Birth Edit</button>
+                        <button onClick={() => birth ? setEditBirth(person) : setNewBirthPerson(person)}>
+                            {birth ? 'Edit Birth' : 'Add Birth'}
+                        </button>
                         <button onClick={() => setEditMarriage(person)}>Marriage Edit</button>
-                        <button onClick={() => setEditDeath(person)}>Death Edit</button>
-                        <button onClick={() => setBirthModal(person)}>Birth Cert</button>
+                        <button onClick={() => death ? setEditDeath(person) : setNewDeathPerson(person)}> {death ? 'Edit Death' : 'Add Death'} </button>
+                        <button onClick={() => setBirthModal(person)}> Birth Cert </button>
                         <button onClick={() => setMarriageModal(person)}>Marriage Cert</button>
                         <button onClick={() => setDeathModal(person)}>Death Cert</button>
                         <button className="delete-btn" onClick={() => handleDelete(person)}>🗑</button>
@@ -253,7 +260,11 @@ function PeopleTable({ people, birthRecords, relationshipRecords, deathRecords, 
 
             {/* Research overlay modals */}
             {editBirth && (
-                <BirthEditModal person={editBirth} onClose={() => setEditBirth(null)} />
+                <BirthEditModal person={editBirth} birthRecord={getLinkedRecords(editBirth, { birthRecords, deathRecords })
+.birth } onClose={() => setEditBirth(null)} /> )}
+            {editDeath && (
+                <DeathEditModal person={editDeath} deathRecord={getLinkedRecords(editDeath, { birthRecords, deathRecords })
+                    .death} onClose={() => setEditDeath(null)} />
             )}
 {/*             {editMarriage && (
                 <MarriageEditModal
@@ -262,9 +273,7 @@ function PeopleTable({ people, birthRecords, relationshipRecords, deathRecords, 
                     onClose={() => setEditMarriage(null)}
                 />
             )}
-            {editDeath && (
-                <DeathEditModal person={editDeath} onClose={() => setEditDeath(null)} />
-            )}
+           
             {editAddress && (
                 <AddressEditModal
                     person={editAddress}

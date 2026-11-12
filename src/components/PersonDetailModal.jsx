@@ -1,7 +1,6 @@
 import { withObservables } from '@nozbe/watermelondb/react';
 import { Q } from '@nozbe/watermelondb';
 import database from '../database';
-import MarriageCertificatePreview from './MarriageCertificatePreview';
 import { displayDetails, formatDate, formatPlace } from '../utils/displayUtils';
 
 const STATUS_LABELS = {

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useDatabase } from '@nozbe/watermelondb/react';
 import { saveToFile } from '../database';
+import { displayDetails, formatDate, formatPlace } from '../utils/displayUtils';
+
 
 export default function PersonForm({ person, onSave, onCancel }) {
     const database = useDatabase();

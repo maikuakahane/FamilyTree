@@ -110,3 +110,96 @@ export async function linkBirthRecord({ personIdB1, birthRecordIdB1 }) {
         });
     });
 }
+
+export async function updateBirthRecord({ birthRecord, form }) {
+    return database.write(async () => {
+        await birthRecord.update(b => {
+            // Person's details
+            b.firstName = form.be_firstName;
+            b.lastName = form.be_lastName;
+            b.birthDay = toNumber(form.be_birthDay);
+            b.birthMonth = toNumber(form.be_birthMonth);
+            b.birthYear = toNumber(form.be_birthYear);
+            b.gender = form.be_gender;
+            b.birthTown = form.be_birthTown;
+            b.birthCounty = form.be_birthCounty;
+            b.birthCountry = form.be_birthCountry;
+            // Mother's details
+            b.motherFirstName = form.be_motherFirstName;
+            b.motherLastName = form.be_motherLastName;
+            b.motherBirthName = form.be_motherBirthName;
+            b.motherBirthDay = toNumber(form.be_motherBirthDay);
+            b.motherBirthMonth = toNumber(form.be_motherBirthMonth);
+            b.motherBirthYear = toNumber(form.be_motherBirthYear);
+            b.motherBirthTown = form.be_motherBirthTown;
+            b.motherBirthCounty = form.be_motherBirthCounty;
+            b.motherBirthCountry = form.be_motherBirthCountry;
+            // Father's details
+            b.fatherFirstName = form.be_fatherFirstName;
+            b.fatherLastName = form.be_fatherLastName;
+            b.fatherBirthName = form.be_fatherBirthName;
+            b.fatherBirthDay = toNumber(form.be_fatherBirthDay);
+            b.fatherBirthMonth = toNumber(form.be_fatherBirthMonth);
+            b.fatherBirthYear = toNumber(form.be_fatherBirthYear);
+            b.fatherBirthTown = form.be_fatherBirthTown;
+            b.fatherBirthCounty = form.be_fatherBirthCounty;
+            b.fatherBirthCountry = form.be_fatherBirthCountry;
+            // Birth and baptism details
+            b.baptismDay = toNumber(form.be_baptismDay);
+            b.baptismMonth = toNumber(form.be_baptismMonth);
+            b.baptismYear = toNumber(form.be_baptismYear);
+            // Birth registration details
+            b.birthRegistryOffice = form.be_birthRegistryOffice;
+            b.birthRegistryBook = form.be_birthRegistryBook;
+            b.birthRegistryVolume = form.be_birthRegistryVolume;
+            b.birthRegistryYear = form.be_birthRegistryYear;
+            b.birthRegistryPage = form.be_birthRegistryPage;
+            b.birthRegistryEntry = form.be_birthRegistryEntry;
+            // Religion
+            b.birthReligion = form.be_birthReligion;
+
+        });
+    });
+}
+
+export async function updateDeathRecord({ deathRecord, form }) {
+    return database.write(async () => {
+        await deathRecord.update(d => {
+            // Person's details
+            d.firstName = form.de_firstName;
+            d.lastName = form.de_lastName;
+            d.birthName = form.de_birthName;
+            d.birthDay = toNumber(form.de_birthDay);
+            d.birthMonth = toNumber(form.de_birthMonth);
+            d.birthYear = toNumber(form.de_birthYear);
+            d.gender = form.de_gender;
+            d.birthTown = form.de_birthTown;
+            d.birthCounty = form.de_birthCounty;
+            d.birthCountry = form.de_birthCountry;
+            d.deathDay = toNumber(form.de_deathDay);
+            d.deathMonth = toNumber(form.de_deathMonth);
+            d.deathYear = toNumber(form.de_deathYear);
+            d.deathTown = form.de_deathTown;
+            d.deathCounty = form.de_deathCounty;
+            d.deathCountry = form.de_deathCountry;
+            d.deathReason = form.de_deathReason;
+            d.addressStreet = form.de_addressStreet;
+            d.addressCounty = form.de_addressCounty;
+            d.addressCountry = form.de_addressCountry;
+            // Spouse's details
+            d.spouseFirstName = form.de_spouseFirstName;
+            d.spouseLastName = form.de_spouseLastName;
+            d.spouseBirthName = form.de_spouseBirthName;
+            // Death registration details
+            d.deathRegistryOffice = form.de_deathRegistryOffice;
+            d.deathRegistryBook = form.de_deathRegistryBook;
+            d.deathRegistryVolume = form.de_deathRegistryVolume;
+            d.deathRegistryYear = form.de_deathRegistryYear;
+            d.deathRegistryPage = form.de_deathRegistryPage;
+            d.deathRegistryEntry = form.be_deathRegistryEntry;
+            // Religion
+            d.deathReligion = form.de_deathReligion;
+
+        });
+    });
+}
