@@ -131,23 +131,18 @@ const STATUS_LABELS = {
 
 function PeopleTable({ people, birthRecords, relationshipRecords, deathRecords, citizenshipRecords, addresses }) {
     const [search, setSearch] = useState('');
-    // Mutually exclusive group: 'general' | 'research' | 'certificates' | null
 
-    // General — full-screen forms/modals
+    // General — modals
     const [showAdd, setShowAdd] = useState(false);
     const [editingPerson, setEditingPerson] = useState(null);
     const [relationshipPerson, setRelationshipPerson] = useState(null);
     const [marriagePerson, setMarriagePerson] = useState(null);
     const [viewingPerson, setViewingPerson] = useState(null);
-
-    // Research — overlay modals
     const [editBirth, setEditBirth] = useState(null);
    // const [editMarriage, setEditMarriage] = useState(null);
     const [editDeath, setEditDeath] = useState(null);
   //  const [editAddress, setEditAddress] = useState(null);
   //  const [editCitizenship, setEditCitizenship] = useState(null);
-
-    // Certificates — overlay modals
     const [birthModal, setBirthModal] = useState(null);
     const [newBirthPerson, setNewBirthPerson] = useState(null);
  //   const [marriageModal, setMarriageModal] = useState(null);
@@ -177,19 +172,6 @@ function PeopleTable({ people, birthRecords, relationshipRecords, deathRecords, 
         }
     };
 
-    // --- Full-screen General forms/modals (replace the table, matching old PeopleList) ---
-    if (showAdd) {
-        return <PersonForm onSave={() => setShowAdd(false)} onCancel={() => setShowAdd(false)} />;
-    }
-    if (editingPerson) {
-        return (
-            <PersonForm
-                person={editingPerson}
-                onSave={() => setEditingPerson(null)}
-                onCancel={() => setEditingPerson(null)}
-            />
-        );
-    }
     if (relationshipPerson) {
         return <RelationshipModal person={relationshipPerson} onClose={() => setRelationshipPerson(null)} />;
     }
@@ -257,8 +239,16 @@ function PeopleTable({ people, birthRecords, relationshipRecords, deathRecords, 
 
     return (
         <div className="people-list">
-
-            {/* Research overlay modals */}
+            {showAdd && (
+                <PersonForm onSave={() => setShowAdd(false)} onCancel={() => setShowAdd(false)} />
+            )}
+            {editingPerson && (
+                <PersonForm
+                    person={editingPerson}
+                    onSave={() => setEditingPerson(null)}
+                    onCancel={() => setEditingPerson(null)}
+                />
+            )}
             {editBirth && (
                 <BirthEditModal person={editBirth} birthRecord={getLinkedRecords(editBirth, { birthRecords, deathRecords })
 .birth } onClose={() => setEditBirth(null)} /> )}

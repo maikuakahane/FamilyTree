@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDatabase } from '@nozbe/watermelondb/react';
 import { saveToFile } from '../database';
 import { displayDetails, formatDate, formatPlace } from '../utils/displayUtils';
+import { createPerson } from '../database/databaseFunctions';
 
 
 export default function PersonForm({ person, onSave, onCancel }) {
@@ -26,27 +27,32 @@ export default function PersonForm({ person, onSave, onCancel }) {
             return;
         }
 
-        const applyFields = (p) => {
-            p.firstNameP = form.p_firstName;
-            p.lastNameP = form.p_lastName;
-            p.birthNameP = form.p_birthName;
-            p.genderP = form.p_gender;
-        };
-
-        await database.write(async () => {
-            if (isEditing) {
-                await person.update(applyFields);
-            } else {
-                await database.collections.get('people').create(applyFields);
-            }
-        });
+        if (isEditing) {
+            await database.write(async () => {
+                await person.update(p => {
+                    p.firstNameP = form.p_firstName;
+                    p.lastNameP = form.p_lastName;
+                    p.birthNameP = form.p_birthName;
+                    p.genderP = form.p_gender;
+                });
+            });
+        } else {
+            await createPerson({
+                firstNameP1: form.p_firstName,
+                lastNameP1: form.p_lastName,
+                birthNameP1: form.p_birthName,
+                genderP1: form.p_gender,
+                isOwner1: false,
+            });
+        }
 
         await saveToFile();
         onSave();
     };
 
     return (
-        <div className="form-container">
+        <div className="modal-overlay">
+            <div className="modal">
             <h2>{isEditing ? `Edit — ${person.firstNameP} ${person.lastNameP}` : 'Add Person'}</h2>
 
                 <div className="form-tab-content">
@@ -84,6 +90,7 @@ export default function PersonForm({ person, onSave, onCancel }) {
                 <button onClick={handleSubmit}>Save</button>
                 <button onClick={onCancel}>Cancel</button>
             </div>
-        </div>
+            </div>
+</div>
     );
 }

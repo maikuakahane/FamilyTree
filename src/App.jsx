@@ -6,6 +6,7 @@ import PeopleTable from './components/PeopleTable';
 import BackupRestore from './components/BackupRestore';
 import WelcomeScreen from './components/WelcomeScreen';
 // import ProfilePage from './components/ProfilePage';
+import RecordsTable from './components/RecordsTable';
 
 function App({ people }) {
     const [view, setView] = useState('list');
@@ -21,6 +22,10 @@ function App({ people }) {
                     className={view === 'list' ? 'nav-active' : ''}
                     onClick={() => setView('list')}
                 >People</button>
+                <button
+                    className={view === 'records' ? 'nav-active' : ''}
+                    onClick={() => setView('records')}
+                >Records</button>
 {/*                 <button
                     className={view === 'profile' ? 'nav-active' : ''}
                     onClick={() => setView('profile')}
@@ -36,6 +41,8 @@ function App({ people }) {
             </nav>
 
             {view === 'list' && <PeopleTable />}
+            {view === 'records' && <RecordsTable />}
+
 {/*             {view === 'tree' && <FamilyTree />}
             {view === 'profile' && <ProfilePage />} */}
             {view === 'backup' && <BackupRestore />}
